@@ -1,0 +1,18 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Selecteer land"
+      },
+      "region": {
+        "title": "Selecteer regio"
+      },
+      "holidays": {
+        "title": "Selecteer vakanties"
+      }
+    },
+    "abort": {
+      "already_configured": "Deze regio is al geconfigureerd."
+    }
+  }
+}

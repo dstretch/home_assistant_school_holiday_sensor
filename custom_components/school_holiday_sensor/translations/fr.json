@@ -1,0 +1,18 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sélectionner un pays"
+      },
+      "region": {
+        "title": "Sélectionner une région"
+      },
+      "holidays": {
+        "title": "Sélectionner les vacances"
+      }
+    },
+    "abort": {
+      "already_configured": "Cette région est déjà configurée."
+    }
+  }
+}

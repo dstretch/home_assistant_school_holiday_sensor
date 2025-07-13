@@ -1,10 +1,18 @@
-config:
-  step:
-    user:
-      title: Select Country
-    region:
-      title: Select Region
-    holidays:
-      title: Select Holidays
-  abort:
-    already_configured: This region is already configured.
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Select Country"
+      },
+      "region": {
+        "title": "Select Region"
+      },
+      "holidays": {
+        "title": "Select Holidays"
+      }
+    },
+    "abort": {
+      "already_configured": "This region is already configured."
+    }
+  }
+}

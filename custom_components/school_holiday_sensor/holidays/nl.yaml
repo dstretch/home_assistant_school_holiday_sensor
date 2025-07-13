@@ -1,9 +1,144 @@
-- '# source': https://www.rijksoverheid.nl/onderwerpen/schoolvakanties
+# source: Rijksoverheid – Overzicht schoolvakantie data per schooljaar (2025‑2026, 2026‑2027, 2027‑2028)
 - name: Regio Noord
   holidays:
-  - name: Meivakantie
-    date_from: 27-04-2026
-    date_till: 08-05-2026
-  - name: Zomervakantie
-    date_from: 13-07-2026
-    date_till: 21-08-2026
+    - name: Herfstvakantie 2025
+      date_from: 18-10-2025
+      date_till: 26-10-2025
+    - name: Kerstvakantie 2025
+      date_from: 20-12-2025
+      date_till: 04-01-2026
+    - name: Voorjaarsvakantie 2026
+      date_from: 21-02-2026
+      date_till: 01-03-2026
+    - name: Meivakantie 2026
+      date_from: 25-04-2026
+      date_till: 03-05-2026
+    - name: Zomervakantie 2026
+      date_from: 04-07-2026
+      date_till: 16-08-2026
+    - name: Herfstvakantie 2026
+      date_from: 10-10-2026
+      date_till: 18-10-2026
+    - name: Kerstvakantie 2026
+      date_from: 19-12-2026
+      date_till: 03-01-2027
+    - name: Voorjaarsvakantie 2027
+      date_from: 20-02-2027
+      date_till: 28-02-2027
+    - name: Meivakantie 2027
+      date_from: 24-04-2027
+      date_till: 02-05-2027
+    - name: Zomervakantie 2027
+      date_from: 10-07-2027
+      date_till: 22-08-2027
+    - name: Herfstvakantie 2027
+      date_from: 16-10-2027
+      date_till: 24-10-2027
+    - name: Kerstvakantie 2027
+      date_from: 25-12-2027
+      date_till: 09-01-2028
+    - name: Voorjaarsvakantie 2028
+      date_from: 19-02-2028
+      date_till: 27-02-2028
+    - name: Meivakantie 2028
+      date_from: 29-04-2028
+      date_till: 07-05-2028
+    - name: Zomervakantie 2028
+      date_from: 15-07-2028
+      date_till: 27-08-2028
+
+- name: Regio Midden
+  holidays:
+    - name: Herfstvakantie 2025
+      date_from: 18-10-2025
+      date_till: 26-10-2025
+    - name: Kerstvakantie 2025
+      date_from: 20-12-2025
+      date_till: 04-01-2026
+    - name: Voorjaarsvakantie 2026
+      date_from: 14-02-2026
+      date_till: 22-02-2026
+    - name: Meivakantie 2026
+      date_from: 25-04-2026
+      date_till: 03-05-2026
+    - name: Zomervakantie 2026
+      date_from: 18-07-2026
+      date_till: 30-08-2026
+    - name: Herfstvakantie 2026
+      date_from: 17-10-2026
+      date_till: 25-10-2026
+    - name: Kerstvakantie 2026
+      date_from: 19-12-2026
+      date_till: 03-01-2027
+    - name: Voorjaarsvakantie 2027
+      date_from: 20-02-2027
+      date_till: 28-02-2027
+    - name: Meivakantie 2027
+      date_from: 24-04-2027
+      date_till: 02-05-2027
+    - name: Zomervakantie 2027
+      date_from: 17-07-2027
+      date_till: 29-08-2027
+    - name: Herfstvakantie 2027
+      date_from: 16-10-2027
+      date_till: 24-10-2027
+    - name: Kerstvakantie 2027
+      date_from: 25-12-2027
+      date_till: 09-01-2028
+    - name: Voorjaarsvakantie 2028
+      date_from: 26-02-2028
+      date_till: 05-03-2028
+    - name: Meivakantie 2028
+      date_from: 29-04-2028
+      date_till: 07-05-2028
+    - name: Zomervakantie 2028
+      date_from: 08-07-2028
+      date_till: 20-08-2028
+
+- name: Regio Zuid
+  holidays:
+    - name: Herfstvakantie 2025
+      date_from: 11-10-2025
+      date_till: 19-10-2025
+    - name: Kerstvakantie 2025
+      date_from: 20-12-2025
+      date_till: 04-01-2026
+    - name: Voorjaarsvakantie 2026
+      date_from: 14-02-2026
+      date_till: 22-02-2026
+    - name: Meivakantie 2026
+      date_from: 25-04-2026
+      date_till: 03-05-2026
+    - name: Zomervakantie 2026
+      date_from: 11-07-2026
+      date_till: 23-08-2026
+    - name: Herfstvakantie 2026
+      date_from: 17-10-2026
+      date_till: 25-10-2026
+    - name: Kerstvakantie 2026
+      date_from: 19-12-2026
+      date_till: 03-01-2027
+    - name: Voorjaarsvakantie 2027
+      date_from: 13-02-2027
+      date_till: 21-02-2027
+    - name: Meivakantie 2027
+      date_from: 24-04-2027
+      date_till: 02-05-2027
+    - name: Zomervakantie 2027
+      date_from: 24-07-2027
+      date_till: 05-09-2027
+    - name: Herfstvakantie 2027
+      date_from: 23-10-2027
+      date_till: 31-10-2027
+    - name: Kerstvakantie 2027
+      date_from: 25-12-2027
+      date_till: 09-01-2028
+    - name: Voorjaarsvakantie 2028
+      date_from: 26-02-2028
+      date_till: 05-03-2028
+    - name: Meivakantie 2028
+      date_from: 29-04-2028
+      date_till: 07-05-2028
+    - name: Zomervakantie 2028
+      date_from: 22-07-2028
+      date_till: 03-09-2028
