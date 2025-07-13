@@ -1,0 +1,54 @@
+# source: https://www.service-public.fr/particuliers/actualites/A18008
+- name: Zone A
+  holidays:
+    - name: Toussaint 2025
+      date_from: 18-10-2025
+      date_till: 03-11-2025
+    - name: Noël 2025
+      date_from: 20-12-2025
+      date_till: 05-01-2026
+    - name: Hiver 2026
+      date_from: 07-02-2026
+      date_till: 23-02-2026
+    - name: Printemps 2026
+      date_from: 04-04-2026
+      date_till: 20-04-2026
+    - name: Été 2026
+      date_from: 04-07-2026
+      date_till: 31-08-2026
+
+- name: Zone B
+  holidays:
+    - name: Toussaint 2025
+      date_from: 18-10-2025
+      date_till: 03-11-2025
+    - name: Noël 2025
+      date_from: 20-12-2025
+      date_till: 05-01-2026
+    - name: Hiver 2026
+      date_from: 14-02-2026
+      date_till: 02-03-2026
+    - name: Printemps 2026
+      date_from: 11-04-2026
+      date_till: 27-04-2026
+    - name: Été 2026
+      date_from: 04-07-2026
+      date_till: 31-08-2026
+
+- name: Zone C
+  holidays:
+    - name: Toussaint 2025
+      date_from: 18-10-2025
+      date_till: 03-11-2025
+    - name: Noël 2025
+      date_from: 20-12-2025
+      date_till: 05-01-2026
+    - name: Hiver 2026
+      date_from: 21-02-2026
+      date_till: 09-03-2026
+    - name: Printemps 2026
+      date_from: 18-04-2026
+      date_till: 04-05-2026
+    - name: Été 2026
+      date_from: 04-07-2026
+      date_till: 31-08-2026
