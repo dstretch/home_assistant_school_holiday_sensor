@@ -83,3 +83,20 @@ class SchoolHolidayConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(step_id="region", data_schema=schema)
 
     async def async_step_holidays(self, user_input=None):
+        if user_input is not None:
+            return self.async_create_entry(title=user_input.get(CONF_NAME, "School Holiday"), data={
+                CONF_NAME: user_input.get(CONF_NAME, "School Holiday"),
+                CONF_COUNTRY: self.country,
+                CONF_REGION: self.region,
+                CONF_HOLIDAYS: user_input[CONF_HOLIDAYS],
+            })
+
+        holidays = get_holiday_options(self.country, self.region)
+        if not holidays:
+            return self.async_abort(reason="no_holidays_found")
+
+        schema = vol.Schema({
+            vol.Optional(CONF_NAME, default="School Holiday"): str,
+            vol.Required(CONF_HOLIDAYS): vol.All(cv.ensure_list, [vol.In(holidays)])
+        })
+        return self.async_show_form(step_id="holidays", data_schema=schema)
