@@ -1,7 +1,7 @@
 {
-  "name": "School Holiday Sensor",
-  "content_in_root": false,
-  "domain": "school_holiday_sensor",
-  "zip_release": false,
-  "filename": "custom_components/school_holiday_sensor/manifest.json"
+    "name": "School Holiday Sensor",
+    "content_in_root": false,
+    "domain": "school_holiday_sensor",
+    "zip_release": false,
+    "filename": "custom_components/school_holiday_sensor/manifest.json"
 }
