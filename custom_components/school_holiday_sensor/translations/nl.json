@@ -2,17 +2,32 @@
   "config": {
     "step": {
       "user": {
-        "title": "Selecteer land"
+        "title": "Selecteer land",
+        "description": "Kies het land waarin jouw regio zich bevindt.",
+        "data": {
+          "country": "Land"
+        }
       },
       "region": {
-        "title": "Selecteer regio"
+        "title": "Selecteer regio",
+        "description": "Kies de regio binnen jouw land.",
+        "data": {
+          "region": "Regio"
+        }
       },
       "holidays": {
-        "title": "Selecteer vakanties"
+        "title": "Selecteer vakanties",
+        "description": "Selecteer één of meer schoolvakantieperiodes om te volgen.",
+        "data": {
+          "name": "Sensornaam",
+          "holidays": "Vakanties"
+        }
       }
     },
     "abort": {
-      "already_configured": "Deze regio is al geconfigureerd."
+      "no_countries_found": "Geen landbestanden gevonden.",
+      "invalid_yaml_file": "Vakantiebestand ongeldig of niet leesbaar.",
+      "no_holidays_found": "Geen vakanties gevonden voor deze regio."
     }
   }
 }

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import yaml
 
@@ -7,44 +9,46 @@ import homeassistant.helpers.config_validation as cv
 
 from .const import DOMAIN, CONF_COUNTRY, CONF_REGION, CONF_HOLIDAYS, CONF_NAME
 
-# Find countries from files in holidays folder
-def get_country_options():
-    folder = os.path.join(os.path.dirname(__file__), "holidays")
-    return sorted(f[:-5] for f in os.listdir(folder) if f.endswith(".yaml"))
+def _holidays_folder() -> str:
+    return os.path.join(os.path.dirname(__file__), "holidays")
 
-def load_yaml(path):
+# List countries based on YAML files in holidays folder
+def get_country_options() -> list[str]:
+    folder = _holidays_folder()
+    try:
+        files = [f for f in os.listdir(folder) if f.endswith(".yaml")]
+    except FileNotFoundError:
+        return []
+    return sorted(f[:-5] for f in files)
+
+def load_yaml(path: str):
     try:
         with open(path, "r", encoding="utf-8") as f:
-            return yaml.safe_load(f)
+            data = yaml.safe_load(f)
+            return data if isinstance(data, list) else []
     except Exception:
         return []
 
-# Regions in the selected country file
-def get_region_options(country):
-    path = os.path.join(os.path.dirname(__file__), "holidays", f"{country}.yaml")
-    regions_raw = load_yaml(path) or []
+# Regions for selected country
+def get_region_options(country: str) -> list[str]:
+    path = os.path.join(_holidays_folder(), f"{country}.yaml")
+    regions_raw = load_yaml(path)
     regions: list[str] = []
-
     for entry in regions_raw:
         if isinstance(entry, dict) and "name" in entry and "holidays" in entry:
             regions.append(str(entry["name"]).strip())
-
     return sorted(regions)
 
-# Holidays names for the selected region
-def get_holiday_options(country, region):
-    path = os.path.join(os.path.dirname(__file__), "holidays", f"{country}.yaml")
-    regions_raw = load_yaml(path) or []
-
+# Holiday names for selected region
+def get_holiday_options(country: str, region: str) -> list[str]:
+    path = os.path.join(_holidays_folder(), f"{country}.yaml")
+    regions_raw = load_yaml(path)
     for entry in regions_raw:
         if isinstance(entry, dict) and entry.get("name", "").strip() == region and "holidays" in entry:
-            holidays = entry["holidays"]
-            return [str(h.get("name", "")).strip() for h in holidays if isinstance(h, dict) and "name" in h]
-
+            return [str(h.get("name", "")).strip() for h in entry["holidays"] if isinstance(h, dict) and h.get("name")]
     return []
 
 class SchoolHolidayConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle the config flow."""
     VERSION = 1
 
     def __init__(self):
@@ -89,7 +93,7 @@ class SchoolHolidayConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_COUNTRY: self.country,
                     CONF_REGION: self.region,
                     CONF_HOLIDAYS: user_input[CONF_HOLIDAYS],
-                }
+                },
             )
 
         holidays = get_holiday_options(self.country, self.region)

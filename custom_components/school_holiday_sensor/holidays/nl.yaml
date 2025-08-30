@@ -1,15 +1,13 @@
-# Each item is a region with a list of holidays
-- name: Noord
+- name: Regio Noord
   holidays:
-    - { name: "Zomervakantie 2025", start: "2025-07-12", end: "2025-08-24" }
-    - { name: "Herfstvakantie 2025", start: "2025-10-18", end: "2025-10-26" }
-
-- name: Midden
+    - name: Herfstvakantie 2025
+      start: "2025-10-18"
+      end:   "2025-10-26"
+    - name: Kerstvakantie 2025
+      start: "20-12-2025"   # DD-MM-YYYY also accepted
+      end:   "04-01-2026"
+- name: Regio Midden
   holidays:
-    - { name: "Zomervakantie 2025", start: "2025-07-19", end: "2025-08-31" }
-    - { name: "Herfstvakantie 2025", start: "2025-10-25", end: "2025-11-02" }
-
-- name: Zuid
-  holidays:
-    - { name: "Zomervakantie 2025", start: "2025-07-05", end: "2025-08-17" }
-    - { name: "Herfstvakantie 2025", start: "2025-10-18", end: "2025-10-26" }
+    - name: Zomervakantie 2026
+      start: "2026-07-18"
+      end:   "2026-08-30"

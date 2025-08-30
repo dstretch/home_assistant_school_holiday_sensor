@@ -2,17 +2,32 @@
   "config": {
     "step": {
       "user": {
-        "title": "Sélectionner un pays"
+        "title": "Sélectionner un pays",
+        "description": "Choisissez le pays qui contient votre région.",
+        "data": {
+          "country": "Pays"
+        }
       },
       "region": {
-        "title": "Sélectionner une région"
+        "title": "Sélectionner une région",
+        "description": "Choisissez la région dans votre pays.",
+        "data": {
+          "region": "Région"
+        }
       },
       "holidays": {
-        "title": "Sélectionner les vacances"
+        "title": "Sélectionner les vacances",
+        "description": "Sélectionnez une ou plusieurs périodes de vacances scolaires à suivre.",
+        "data": {
+          "name": "Nom du capteur",
+          "holidays": "Vacances"
+        }
       }
     },
     "abort": {
-      "already_configured": "Cette région est déjà configurée."
+      "no_countries_found": "Aucun fichier de pays trouvé.",
+      "invalid_yaml_file": "Fichier de vacances invalide ou illisible.",
+      "no_holidays_found": "Aucune période de vacances trouvée pour cette région."
     }
   }
 }
