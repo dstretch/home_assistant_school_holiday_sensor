@@ -13,6 +13,7 @@ CONF_REGION = "region"
 CONF_HOLIDAYS = "holidays"
 CONF_NAME = "name"
 
+# First get country based on files in the holidays folder
 def get_country_options():
     folder = os.path.join(os.path.dirname(__file__), "holidays")
     return sorted(f[:-5] for f in os.listdir(folder) if f.endswith(".yaml"))
@@ -25,6 +26,7 @@ def load_yaml(path):
         print(f"YAML load failed: {e}")
         return []
 
+# Then read file and get regions of that country file
 def get_region_options(country):
     path = os.path.join(os.path.dirname(__file__), "holidays", f"{country}.yaml")
     regions_raw = load_yaml(path)
@@ -36,6 +38,7 @@ def get_region_options(country):
 
     return sorted(regions)
 
+# From the region file, get the holidays
 def get_holiday_options(country, region):
     path = os.path.join(os.path.dirname(__file__), "holidays", f"{country}.yaml")
     regions_raw = load_yaml(path)
@@ -47,6 +50,7 @@ def get_holiday_options(country, region):
 
     return []
 
+# Config flow
 class SchoolHolidayConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
