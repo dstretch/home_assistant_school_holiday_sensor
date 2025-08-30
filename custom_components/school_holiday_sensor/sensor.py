@@ -14,6 +14,8 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
 from homeassistant.helpers.typing import StateType
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from typing import Any, Callable, Optional
 
 from .const import (
     DOMAIN,
@@ -27,6 +29,17 @@ _LOGGER = logging.getLogger(__name__)
 
 UPDATE_INTERVAL = timedelta(hours=6)  # holiday windows change slowly
 
+async def async_setup_platform(
+    hass: HomeAssistant,
+    config: ConfigType,
+    async_add_entities: Callable,
+    discovery_info: Optional[DiscoveryInfoType] = None,
+) -> None:
+    """Set up the sensor platform."""
+    # This function is called by Home Assistant when using config flow
+    # The actual setup is handled by async_setup_entry
+    pass
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -36,11 +49,9 @@ async def async_setup_entry(
     selected_holidays: list[str] = entry.data.get(CONF_HOLIDAYS, [])
     friendly_name: str = entry.data.get(CONF_NAME, "School Holiday")
 
-    # You likely already have a YAML loader in config_flow.py.
-    # Reuse/import a helper here (or duplicate carefully) to get the *date ranges*.
-    # Expected structure per holiday (example):
-    #   {"name": "Summer", "start": "2025-07-12", "end": "2025-08-25"}
-    from .config_flow import load_yaml  # reuse safely
+    # Load holiday data from YAML files
+    # Expected structure per holiday: {"name": "Summer", "start": "2025-07-12", "end": "2025-08-25"}
+    from .config_flow import load_yaml
     import os
 
     holidays_path = os.path.join(os.path.dirname(__file__), "holidays", f"{country}.yaml")
