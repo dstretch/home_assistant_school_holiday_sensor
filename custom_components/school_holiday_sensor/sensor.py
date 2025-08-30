@@ -23,20 +23,12 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 UPDATE_INTERVAL = timedelta(hours=6)
 
-# Permissive platform schema to avoid 'extra keys not allowed' if someone added YAML.
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({}, extra=vol.ALLOW_EXTRA)
 
 async def async_setup_platform(hass: HomeAssistant, config, async_add_entities, discovery_info=None):
-    """Guard against YAML platform setup. We only support config flow."""
-    _LOGGER.error(
-        "School Holiday Sensor must be set up via the UI (config flow). "
-        "Please remove any YAML under 'sensor: - platform: school_holiday'. "
-        "Proceed to Settings → Devices & Services → Add Integration."
-    )
-    # Do nothing else.
+    _LOGGER.error("School Holiday Sensor must be set up via the UI (config flow). Remove any YAML platform entries.")
 
 def _parse_date(s: Optional[str]):
-    """Parse either YYYY-MM-DD (preferred) or DD-MM-YYYY into a date."""
     if not s:
         return None
     s = str(s).strip()
@@ -55,7 +47,7 @@ async def async_setup_entry(
     selected_holidays: List[str] = entry.data.get(CONF_HOLIDAYS, [])
     friendly_name: str = entry.data.get(CONF_NAME, "School Holiday")
 
-    from .config_flow import load_yaml  # reuse helper
+    from .config_flow import load_yaml
     import os
 
     holidays_path = os.path.join(os.path.dirname(__file__), "holidays", f"{country}.yaml")

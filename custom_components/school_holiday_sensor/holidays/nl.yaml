@@ -3,9 +3,6 @@
     - name: Herfstvakantie 2025
       start: "2025-10-18"
       end:   "2025-10-26"
-    - name: Kerstvakantie 2025
-      start: "20-12-2025"   # DD-MM-YYYY also accepted
-      end:   "04-01-2026"
 - name: Regio Midden
   holidays:
     - name: Zomervakantie 2026

@@ -12,7 +12,6 @@ from .const import DOMAIN, CONF_COUNTRY, CONF_REGION, CONF_HOLIDAYS, CONF_NAME
 def _holidays_folder() -> str:
     return os.path.join(os.path.dirname(__file__), "holidays")
 
-# List countries based on YAML files in holidays folder
 def get_country_options() -> list[str]:
     folder = _holidays_folder()
     try:
@@ -29,7 +28,6 @@ def load_yaml(path: str):
     except Exception:
         return []
 
-# Regions for selected country
 def get_region_options(country: str) -> list[str]:
     path = os.path.join(_holidays_folder(), f"{country}.yaml")
     regions_raw = load_yaml(path)
@@ -39,7 +37,6 @@ def get_region_options(country: str) -> list[str]:
             regions.append(str(entry["name"]).strip())
     return sorted(regions)
 
-# Holiday names for selected region
 def get_holiday_options(country: str, region: str) -> list[str]:
     path = os.path.join(_holidays_folder(), f"{country}.yaml")
     regions_raw = load_yaml(path)

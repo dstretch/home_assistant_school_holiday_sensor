@@ -1,12 +1,13 @@
 {
-  "domain": "school_holiday",
+  "domain": "school_holiday_sensor",
   "name": "School Holiday Sensor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "documentation": "",
   "codeowners": [
     "@community"
   ],
   "requirements": [],
   "config_flow": true,
+  "integration_type": "helper",
   "iot_class": "calculated"
 }

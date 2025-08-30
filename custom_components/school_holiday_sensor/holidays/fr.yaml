@@ -3,8 +3,3 @@
     - name: Vacances d'été 2025
       start: "2025-07-05"
       end:   "2025-09-01"
-- name: Zone B
-  holidays:
-    - name: Vacances d'été 2025
-      start: "2025-07-12"
-      end:   "2025-09-01"
