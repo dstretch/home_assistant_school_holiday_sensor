@@ -1,0 +1,306 @@
+name: Validate Holiday and Translation Files
+
+on:
+  pull_request:
+    paths:
+      - 'custom_components/school_holiday_sensor/holidays/**'
+      - 'custom_components/school_holiday_sensor/translations/**'
+      - '.github/workflows/validate-files.yml'
+
+jobs:
+  validate-holidays:
+    name: Validate Holiday Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml jsonschema
+
+      - name: Validate YAML syntax
+        run: |
+          echo "Validating YAML syntax for holiday files..."
+          for file in custom_components/school_holiday_sensor/holidays/*.yaml; do
+            echo "Checking $file"
+            python -c "
+          import yaml
+          import sys
+          try:
+              with open('$file', 'r', encoding='utf-8') as f:
+                  yaml.safe_load(f)
+              print('✓ $file - Valid YAML')
+          except yaml.YAMLError as e:
+              print('✗ $file - Invalid YAML: $e')
+              sys.exit(1)
+          except Exception as e:
+              print('✗ $file - Error: $e')
+              sys.exit(1)
+          "
+          done
+
+      - name: Validate holiday file structure
+        run: |
+          echo "Validating holiday file structure..."
+          python -c "
+          import yaml
+          import sys
+          from datetime import datetime
+          import re
+
+          def validate_date_format(date_str):
+              '''Validate DD-MM-YYYY format'''
+              try:
+                  datetime.strptime(date_str, '%d-%m-%Y')
+                  return True
+              except ValueError:
+                  return False
+
+          def validate_holiday_file(filepath):
+              with open(filepath, 'r', encoding='utf-8') as f:
+                  data = yaml.safe_load(f)
+              
+              if not isinstance(data, list):
+                  raise ValueError('Root element must be a list')
+              
+              for region in data:
+                  if not isinstance(region, dict):
+                      raise ValueError('Each region must be a dictionary')
+                  
+                  if 'name' not in region:
+                      raise ValueError('Each region must have a name')
+                  
+                  if 'holidays' not in region:
+                      raise ValueError('Each region must have holidays')
+                  
+                  if not isinstance(region['holidays'], list):
+                      raise ValueError('Holidays must be a list')
+                  
+                  for holiday in region['holidays']:
+                      if not isinstance(holiday, dict):
+                          raise ValueError('Each holiday must be a dictionary')
+                      
+                      required_fields = ['name', 'date_from', 'date_till']
+                      for field in required_fields:
+                          if field not in holiday:
+                              raise ValueError(f'Holiday missing required field: {field}')
+                      
+                      if not validate_date_format(holiday['date_from']):
+                          raise ValueError(f'Invalid date_from format: {holiday[\"date_from\"]} (expected DD-MM-YYYY)')
+                      
+                      if not validate_date_format(holiday['date_till']):
+                          raise ValueError(f'Invalid date_till format: {holiday[\"date_till\"]} (expected DD-MM-YYYY)')
+                      
+                      # Validate date logic
+                      from_date = datetime.strptime(holiday['date_from'], '%d-%m-%Y')
+                      till_date = datetime.strptime(holiday['date_till'], '%d-%m-%Y')
+                      
+                      if from_date > till_date:
+                          raise ValueError(f'date_from ({holiday[\"date_from\"]}) cannot be after date_till ({holiday[\"date_till\"]})')
+                      
+                      # Check for year consistency in holiday name vs dates
+                      holiday_name = holiday['name'].lower()
+                      from_year = from_date.year
+                      till_year = till_date.year
+                      
+                      # Extract year from holiday name if present
+                      import re
+                      name_years = re.findall(r'20\d{2}', holiday_name)
+                      if name_years:
+                          name_year = int(name_years[0])
+                          if name_year != from_year and name_year != till_year:
+                              raise ValueError(f'Holiday name year ({name_year}) does not match date years ({from_year}-{till_year})')
+
+          # Validate all holiday files
+          import glob
+          holiday_files = glob.glob('custom_components/school_holiday_sensor/holidays/*.yaml')
+          
+          for file in holiday_files:
+              try:
+                  validate_holiday_file(file)
+                  print(f'✓ {file} - Valid structure')
+              except Exception as e:
+                  print(f'✗ {file} - Invalid structure: {e}')
+                  sys.exit(1)
+          
+          print('All holiday files are valid!')
+          "
+
+  validate-translations:
+    name: Validate Translation Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema
+
+      - name: Validate JSON syntax
+        run: |
+          echo "Validating JSON syntax for translation files..."
+          for file in custom_components/school_holiday_sensor/translations/*.json; do
+            echo "Checking $file"
+            python -c "
+          import json
+          import sys
+          try:
+              with open('$file', 'r', encoding='utf-8') as f:
+                  json.load(f)
+              print('✓ $file - Valid JSON')
+          except json.JSONDecodeError as e:
+              print('✗ $file - Invalid JSON: $e')
+              sys.exit(1)
+          except Exception as e:
+              print('✗ $file - Error: $e')
+              sys.exit(1)
+          "
+          done
+
+      - name: Validate translation file structure
+        run: |
+          echo "Validating translation file structure..."
+          python -c "
+          import json
+          import sys
+          import glob
+          from collections import defaultdict
+
+          def get_nested_keys(data, prefix=''):
+              '''Recursively get all nested keys'''
+              keys = set()
+              if isinstance(data, dict):
+                  for key, value in data.items():
+                      current_key = f'{prefix}.{key}' if prefix else key
+                      keys.add(current_key)
+                      if isinstance(value, dict):
+                          keys.update(get_nested_keys(value, current_key))
+              return keys
+
+          # Load all translation files
+          translation_files = glob.glob('custom_components/school_holiday_sensor/translations/*.json')
+          translations = {}
+          
+          for file in translation_files:
+              with open(file, 'r', encoding='utf-8') as f:
+                  translations[file] = json.load(f)
+          
+          # Get all keys from all files
+          all_keys = set()
+          for file, data in translations.items():
+              keys = get_nested_keys(data)
+              all_keys.update(keys)
+          
+          # Check if all files have the same keys
+          missing_keys = defaultdict(list)
+          for file, data in translations.items():
+              file_keys = get_nested_keys(data)
+              for key in all_keys:
+                  if key not in file_keys:
+                      missing_keys[key].append(file)
+          
+          if missing_keys:
+              print('✗ Translation files have missing keys:')
+              for key, files in missing_keys.items():
+                  print(f'  Key \"{key}\" missing in: {', '.join(files)}')
+              sys.exit(1)
+          
+          # Validate required structure
+          required_structure = {
+              'config.step.user.title',
+              'config.step.region.title', 
+              'config.step.holidays.title',
+              'config.abort.already_configured'
+          }
+          
+          for file, data in translations.items():
+              file_keys = get_nested_keys(data)
+              missing_required = required_structure - file_keys
+              if missing_required:
+                  print(f'✗ {file} missing required keys: {missing_required}')
+                  sys.exit(1)
+          
+          print('✓ All translation files have consistent structure!')
+          "
+
+      - name: Check for duplicate keys
+        run: |
+          echo "Checking for duplicate keys in translation files..."
+          python -c "
+          import json
+          import sys
+          import glob
+
+          def check_duplicates(data, path=''):
+              '''Check for duplicate keys in nested dictionaries'''
+              if isinstance(data, dict):
+                  seen_keys = set()
+                  for key, value in data.items():
+                      if key in seen_keys:
+                          raise ValueError(f'Duplicate key \"{key}\" found at path \"{path}\"')
+                      seen_keys.add(key)
+                      check_duplicates(value, f'{path}.{key}' if path else key)
+
+          translation_files = glob.glob('custom_components/school_holiday_sensor/translations/*.json')
+          
+          for file in translation_files:
+              try:
+                  with open(file, 'r', encoding='utf-8') as f:
+                      data = json.load(f)
+                  check_duplicates(data)
+                  print(f'✓ {file} - No duplicate keys')
+              except Exception as e:
+                  print(f'✗ {file} - {e}')
+                  sys.exit(1)
+          
+          print('All translation files are valid!')
+          "
+
+  validate-file-names:
+    name: Validate File Names
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate file naming conventions
+        run: |
+          echo "Validating file naming conventions..."
+          
+          # Check holiday files use lowercase country codes
+          echo "Checking holiday file names..."
+          for file in custom_components/school_holiday_sensor/holidays/*.yaml; do
+            filename=$(basename "$file" .yaml)
+            if [[ ! "$filename" =~ ^[a-z]{2}$ ]]; then
+              echo "✗ Holiday file $file should use lowercase 2-letter country code (e.g., gb.yaml, de.yaml)"
+              exit 1
+            fi
+            echo "✓ $file - Valid naming"
+          done
+          
+          # Check translation files use lowercase language codes
+          echo "Checking translation file names..."
+          for file in custom_components/school_holiday_sensor/translations/*.json; do
+            filename=$(basename "$file" .json)
+            if [[ ! "$filename" =~ ^[a-z]{2}$ ]]; then
+              echo "✗ Translation file $file should use lowercase 2-letter language code (e.g., en.json, de.json)"
+              exit 1
+            fi
+            echo "✓ $file - Valid naming"
+          done
+          
+          echo "All file names are valid!"
