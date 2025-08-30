@@ -6,12 +6,7 @@ from homeassistant import config_entries
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 
-from .const import DOMAIN
-
-CONF_COUNTRY = "country"
-CONF_REGION = "region"
-CONF_HOLIDAYS = "holidays"
-CONF_NAME = "name"
+from .const import DOMAIN, CONF_COUNTRY, CONF_REGION, CONF_HOLIDAYS, CONF_NAME
 
 # First get country based on files in the holidays folder
 def get_country_options():
