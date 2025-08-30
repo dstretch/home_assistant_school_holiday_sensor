@@ -1,4 +1,3 @@
-# custom_components/school_holiday/sensor.py
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
@@ -14,8 +13,6 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
 from homeassistant.helpers.typing import StateType
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from typing import Any, Callable, Optional
 
 from .const import (
     DOMAIN,
@@ -27,49 +24,26 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-UPDATE_INTERVAL = timedelta(hours=6)  # holiday windows change slowly
-
-async def async_setup_platform(
-    hass: HomeAssistant,
-    config: ConfigType,
-    async_add_entities: Callable,
-    discovery_info: Optional[DiscoveryInfoType] = None,
-) -> None:
-    """Set up the sensor platform."""
-    # This function is called by Home Assistant when using config flow
-    # The actual setup is handled by async_setup_entry
-    pass
+UPDATE_INTERVAL = timedelta(hours=6)
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up School Holiday sensor from a config entry."""
     country: str = entry.data.get(CONF_COUNTRY)
-    # Handle both old and new data structures
-    if CONF_REGION in entry.data:
-        region: str | None = entry.data.get(CONF_REGION)
-    else:
-        # Extract region from location field
-        location = entry.data.get("location", "")
-        if "/" in location:
-            country, region = location.split("/", 1)
-        else:
-            region = None
+    region: str | None = entry.data.get(CONF_REGION)
     selected_holidays: list[str] = entry.data.get(CONF_HOLIDAYS, [])
     friendly_name: str = entry.data.get(CONF_NAME, "School Holiday")
 
-    # Load holiday data from YAML files
-    # Expected structure per holiday: {"name": "Summer", "start": "2025-07-12", "end": "2025-08-25"}
-    from .config_flow import load_yaml
+    from .config_flow import load_yaml  # reuse file reader
     import os
 
     holidays_path = os.path.join(os.path.dirname(__file__), "holidays", f"{country}.yaml")
-    regions_raw = load_yaml(holidays_path)
+    regions_raw = load_yaml(holidays_path) or []
 
-    # Extract only the selected region and only the user-selected holiday names.
     def _collect_selected_ranges() -> list[dict[str, Any]]:
         ranges: list[dict[str, Any]] = []
-        for entry_region in regions_raw or []:
+        for entry_region in regions_raw:
             if not isinstance(entry_region, dict):
                 continue
             if entry_region.get("name", "").strip() != (region or "").strip():
@@ -78,39 +52,27 @@ async def async_setup_entry(
                 if not isinstance(h, dict):
                     continue
                 name = h.get("name")
-                if name and name.strip() in selected_holidays:
-                    # Parse start/end as dates; keep naive date in UTC.
+                if name and str(name).strip() in selected_holidays:
                     start_s = h.get("start")
                     end_s = h.get("end")
                     if not start_s or not end_s:
                         continue
                     try:
-                        start_d = datetime.fromisoformat(start_s).date()
-                        end_d = datetime.fromisoformat(end_s).date()
+                        start_d = datetime.fromisoformat(str(start_s)).date()
+                        end_d = datetime.fromisoformat(str(end_s)).date()
                     except Exception as exc:
                         _LOGGER.warning("Skipping holiday %s due to bad dates: %s", name, exc)
                         continue
-                    ranges.append({"name": name.strip(), "start": start_d, "end": end_d})
+                    ranges.append({"name": str(name).strip(), "start": start_d, "end": end_d})
         return ranges
 
     async def _async_update_data() -> dict[str, Any]:
-        """Compute whether today is within any selected holiday ranges."""
         today = datetime.now(timezone.utc).date()
         ranges = _collect_selected_ranges()
 
-        current = None
-        next_h = None
-
-        # Find current holiday (today within [start, end])
-        for r in ranges:
-            if r["start"] <= today <= r["end"]:
-                current = r
-                break
-
-        # Find next holiday by earliest start date in the future
-        future = [r for r in ranges if r["start"] > today]
-        if future:
-            next_h = sorted(future, key=lambda r: r["start"])[0]
+        current = next((r for r in ranges if r["start"] <= today <= r["end"]), None)
+        future = sorted([r for r in ranges if r["start"] > today], key=lambda r: r["start"])
+        next_h = future[0] if future else None
 
         return {
             "on_holiday": current is not None,
@@ -135,7 +97,6 @@ async def async_setup_entry(
         update_interval=UPDATE_INTERVAL,
     )
 
-    # Prime data once before creating entities
     await coordinator.async_config_entry_first_refresh()
 
     entity = SchoolHolidaySensor(
@@ -173,7 +134,6 @@ class SchoolHolidaySensor(CoordinatorEntity[DataUpdateCoordinator[dict[str, Any]
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return rich attributes: current/next holiday info and selection context."""
         data = self.coordinator.data or {}
         return {
             "current_holiday": data.get("current_holiday"),
@@ -191,7 +151,6 @@ class SchoolHolidaySensor(CoordinatorEntity[DataUpdateCoordinator[dict[str, Any]
 
     @property
     def device_info(self) -> dict[str, Any]:
-        """Group under a single device in the registry."""
         data = self.coordinator.data or {}
         country = data.get("country")
         region = data.get("region")

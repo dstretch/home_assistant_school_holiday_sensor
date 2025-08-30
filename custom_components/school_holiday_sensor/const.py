@@ -1,4 +1,4 @@
-DOMAIN = "school_holiday_sensor"
+DOMAIN = "school_holiday"
 
 CONF_COUNTRY = "country"
 CONF_REGION = "region"

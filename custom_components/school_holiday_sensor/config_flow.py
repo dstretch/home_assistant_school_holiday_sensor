@@ -1,6 +1,5 @@
 import os
 import yaml
-import urllib.parse
 
 from homeassistant import config_entries
 import voluptuous as vol
@@ -8,68 +7,49 @@ import homeassistant.helpers.config_validation as cv
 
 from .const import DOMAIN, CONF_COUNTRY, CONF_REGION, CONF_HOLIDAYS, CONF_NAME
 
-# First get country based on files in the holidays folder
+# Find countries from files in holidays folder
 def get_country_options():
     folder = os.path.join(os.path.dirname(__file__), "holidays")
     return sorted(f[:-5] for f in os.listdir(folder) if f.endswith(".yaml"))
 
 def load_yaml(path):
     try:
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
-    except Exception as e:
-        print(f"YAML load failed: {e}")
+    except Exception:
         return []
 
-# Then read file and get regions of that country file
+# Regions in the selected country file
 def get_region_options(country):
     path = os.path.join(os.path.dirname(__file__), "holidays", f"{country}.yaml")
-    regions_raw = load_yaml(path)
-    regions = []
+    regions_raw = load_yaml(path) or []
+    regions: list[str] = []
 
     for entry in regions_raw:
         if isinstance(entry, dict) and "name" in entry and "holidays" in entry:
-            regions.append(entry["name"].strip())
+            regions.append(str(entry["name"]).strip())
 
     return sorted(regions)
 
-# From the region file, get the holidays
+# Holidays names for the selected region
 def get_holiday_options(country, region):
     path = os.path.join(os.path.dirname(__file__), "holidays", f"{country}.yaml")
-    regions_raw = load_yaml(path)
+    regions_raw = load_yaml(path) or []
 
     for entry in regions_raw:
         if isinstance(entry, dict) and entry.get("name", "").strip() == region and "holidays" in entry:
             holidays = entry["holidays"]
-            return [h["name"].strip() for h in holidays if "name" in h]
+            return [str(h.get("name", "")).strip() for h in holidays if isinstance(h, dict) and "name" in h]
 
     return []
 
-# Config flow
 class SchoolHolidayConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle the config flow."""
     VERSION = 1
 
     def __init__(self):
-        self.country = None
-        self.region = None
-
-    @staticmethod
-    @config_entries.callback
-    def async_get_options_flow(config_entry):
-        """Get the options flow for this handler."""
-        return None
-
-
-
-
-
-
-
-
-
-
-
-
+        self.country: str | None = None
+        self.region: str | None = None
 
     async def async_step_user(self, user_input=None):
         if user_input is not None:
@@ -101,14 +81,13 @@ class SchoolHolidayConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_holidays(self, user_input=None):
         if user_input is not None:
-            # Temporarily remove region to test if that's causing the validation error
             title = f"{user_input.get(CONF_NAME, 'School Holiday')} ({self.country}/{self.region})"
             return self.async_create_entry(
-                title=title, 
+                title=title,
                 data={
                     CONF_NAME: user_input.get(CONF_NAME, "School Holiday"),
                     CONF_COUNTRY: self.country,
-                    "location": f"{self.country}/{self.region}",  # Combine country and region
+                    CONF_REGION: self.region,
                     CONF_HOLIDAYS: user_input[CONF_HOLIDAYS],
                 }
             )
@@ -118,7 +97,7 @@ class SchoolHolidayConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="no_holidays_found")
 
         schema = vol.Schema({
-            vol.Optional(CONF_NAME, default="School Holiday"): str,
-            vol.Required(CONF_HOLIDAYS): vol.All(cv.ensure_list, [vol.In(holidays)])
+            vol.Optional(CONF_NAME, default="School Holiday"): cv.string,
+            vol.Required(CONF_HOLIDAYS): vol.All(cv.ensure_list, [vol.In(holidays)]),
         })
         return self.async_show_form(step_id="holidays", data_schema=schema)

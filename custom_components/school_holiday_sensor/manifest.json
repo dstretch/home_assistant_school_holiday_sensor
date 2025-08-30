@@ -1,13 +1,11 @@
 {
-    "domain": "school_holiday_sensor",
-    "name": "School Holiday Sensor",
-    "version": "0.0.3",
+    "domain": "school_holiday",
+    "name": "School Holiday",
+    "version": "0.1.0",
     "config_flow": true,
-    "documentation": "https://github.com/bsmeding/home_assistant_school_holiday_sensor",
-    "requirements": [],
-    "codeowners": [
-        "@bsmeding"
-    ],
-    "dependencies": [],
-    "iot_class": "local_polling"
-}
+    "documentation": "",
+    "codeowners": ["@you"],
+    "iot_class": "calculated",
+    "requirements": []
+  }
+  

@@ -2,17 +2,32 @@
   "config": {
     "step": {
       "user": {
-        "title": "Select Country"
+        "title": "Select country",
+        "description": "Pick the country that contains your region.",
+        "data": {
+          "country": "Country"
+        }
       },
       "region": {
-        "title": "Select Region"
+        "title": "Select region",
+        "description": "Pick the region within your country.",
+        "data": {
+          "region": "Region"
+        }
       },
       "holidays": {
-        "title": "Select Holidays"
+        "title": "Select holidays",
+        "description": "Select one or more school holiday periods to track.",
+        "data": {
+          "name": "Sensor name",
+          "holidays": "Holidays"
+        }
       }
     },
     "abort": {
-      "already_configured": "This region is already configured."
+      "no_countries_found": "No country files found.",
+      "invalid_yaml_file": "Holiday file invalid or unreadable.",
+      "no_holidays_found": "No holidays found for this region."
     }
   }
 }
