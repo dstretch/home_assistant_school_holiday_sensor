@@ -45,7 +45,16 @@ async def async_setup_entry(
 ) -> None:
     """Set up School Holiday sensor from a config entry."""
     country: str = entry.data.get(CONF_COUNTRY)
-    region: str | None = entry.data.get(CONF_REGION)
+    # Handle both old and new data structures
+    if CONF_REGION in entry.data:
+        region: str | None = entry.data.get(CONF_REGION)
+    else:
+        # Extract region from location field
+        location = entry.data.get("location", "")
+        if "/" in location:
+            country, region = location.split("/", 1)
+        else:
+            region = None
     selected_holidays: list[str] = entry.data.get(CONF_HOLIDAYS, [])
     friendly_name: str = entry.data.get(CONF_NAME, "School Holiday")
 

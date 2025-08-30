@@ -53,6 +53,24 @@ class SchoolHolidayConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.country = None
         self.region = None
 
+    @staticmethod
+    @config_entries.callback
+    def async_get_options_flow(config_entry):
+        """Get the options flow for this handler."""
+        return None
+
+
+
+
+
+
+
+
+
+
+
+
+
     async def async_step_user(self, user_input=None):
         if user_input is not None:
             self.country = user_input[CONF_COUNTRY]
@@ -83,12 +101,17 @@ class SchoolHolidayConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_holidays(self, user_input=None):
         if user_input is not None:
-            return self.async_create_entry(title=user_input.get(CONF_NAME, "School Holiday"), data={
-                CONF_NAME: user_input.get(CONF_NAME, "School Holiday"),
-                CONF_COUNTRY: self.country,
-                CONF_REGION: self.region,
-                CONF_HOLIDAYS: user_input[CONF_HOLIDAYS],
-            })
+            # Temporarily remove region to test if that's causing the validation error
+            title = f"{user_input.get(CONF_NAME, 'School Holiday')} ({self.country}/{self.region})"
+            return self.async_create_entry(
+                title=title, 
+                data={
+                    CONF_NAME: user_input.get(CONF_NAME, "School Holiday"),
+                    CONF_COUNTRY: self.country,
+                    "location": f"{self.country}/{self.region}",  # Combine country and region
+                    CONF_HOLIDAYS: user_input[CONF_HOLIDAYS],
+                }
+            )
 
         holidays = get_holiday_options(self.country, self.region)
         if not holidays:
