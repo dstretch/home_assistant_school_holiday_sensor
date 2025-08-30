@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "documentation": "",
   "codeowners": [
-    "@bsmeding"
+    "@community"
   ],
   "requirements": [],
   "config_flow": true,

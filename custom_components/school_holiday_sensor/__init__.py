@@ -1,9 +1,16 @@
 from __future__ import annotations
 
+import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
+
+# Permissive schema to swallow any stray YAML under 'school_holiday:' without errors
+CONFIG_SCHEMA = vol.Schema(
+    {DOMAIN: vol.Schema({}, extra=vol.ALLOW_EXTRA)},
+    extra=vol.ALLOW_EXTRA,
+)
 
 PLATFORMS: list[str] = ["sensor"]
 
