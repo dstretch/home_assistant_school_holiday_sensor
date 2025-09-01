@@ -1,104 +1,77 @@
-from __future__ import annotations
-
-import os
-import yaml
+"""Config flow for the Home Assistant School Holiday Sensor."""
+import logging
+import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 
 from homeassistant import config_entries
-import voluptuous as vol
-import homeassistant.helpers.config_validation as cv
+from homeassistant.core import HomeAssistant
+from .const import DOMAIN
+from .school_holiday_api import SchoolHolidayAPI
 
-from .const import DOMAIN, CONF_COUNTRY, CONF_REGION, CONF_HOLIDAYS, CONF_NAME
+_LOGGER = logging.getLogger(__name__)
 
-def _holidays_folder() -> str:
-    return os.path.join(os.path.dirname(__file__), "holidays")
-
-def get_country_options() -> list[str]:
-    folder = _holidays_folder()
-    try:
-        files = [f for f in os.listdir(folder) if f.endswith(".yaml")]
-    except FileNotFoundError:
-        return []
-    return sorted(f[:-5] for f in files)
-
-def load_yaml(path: str):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-            return data if isinstance(data, list) else []
-    except Exception:
-        return []
-
-def get_region_options(country: str) -> list[str]:
-    path = os.path.join(_holidays_folder(), f"{country}.yaml")
-    regions_raw = load_yaml(path)
-    regions: list[str] = []
-    for entry in regions_raw:
-        if isinstance(entry, dict) and "name" in entry and "holidays" in entry:
-            regions.append(str(entry["name"]).strip())
-    return sorted(regions)
-
-def get_holiday_options(country: str, region: str) -> list[str]:
-    path = os.path.join(_holidays_folder(), f"{country}.yaml")
-    regions_raw = load_yaml(path)
-    for entry in regions_raw:
-        if isinstance(entry, dict) and entry.get("name", "").strip() == region and "holidays" in entry:
-            return [str(h.get("name", "")).strip() for h in entry["holidays"] if isinstance(h, dict) and h.get("name")]
-    return []
+async def validate_input(hass: HomeAssistant, data: dict) -> dict:
+    """Validate the user input."""
+    # This function is not strictly needed for this simple example,
+    # but it's good practice for complex validations.
+    return {"title": f"School Holidays ({data['country']}-{data['region']})"}
 
 class SchoolHolidayConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for the school holiday sensor."""
+
     VERSION = 1
 
     def __init__(self):
-        self.country: str | None = None
-        self.region: str | None = None
+        """Initialize the config flow."""
+        self.data = {}
+        self.api = SchoolHolidayAPI()
 
     async def async_step_user(self, user_input=None):
+        """Handle the initial step of a user-initiated config flow."""
+        errors = {}
+
         if user_input is not None:
-            self.country = user_input[CONF_COUNTRY]
+            self.data = user_input
             return await self.async_step_region()
 
-        countries = get_country_options()
-        if not countries:
-            return self.async_abort(reason="no_countries_found")
-
+        countries = await self.hass.async_add_executor_job(self.api.get_countries)
+        
         schema = vol.Schema({
-            vol.Required(CONF_COUNTRY): vol.In(countries)
+            vol.Required("country"): vol.In(sorted(list(countries.keys()))),
         })
-        return self.async_show_form(step_id="user", data_schema=schema)
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=schema,
+            errors=errors
+        )
 
     async def async_step_region(self, user_input=None):
+        """Handle the region selection step."""
+        errors = {}
+
         if user_input is not None:
-            self.region = user_input[CONF_REGION]
-            return await self.async_step_holidays()
-
-        regions = get_region_options(self.country)
-        if not regions:
-            return self.async_abort(reason="invalid_yaml_file")
-
-        schema = vol.Schema({
-            vol.Required(CONF_REGION): vol.In(regions)
-        })
-        return self.async_show_form(step_id="region", data_schema=schema)
-
-    async def async_step_holidays(self, user_input=None):
-        if user_input is not None:
-            title = f"{user_input.get(CONF_NAME, 'School Holiday')} ({self.country}/{self.region})"
+            self.data.update(user_input)
+            
+            # Use the data to create a config entry.
+            info = await validate_input(self.hass, self.data)
+            
             return self.async_create_entry(
-                title=title,
-                data={
-                    CONF_NAME: user_input.get(CONF_NAME, "School Holiday"),
-                    CONF_COUNTRY: self.country,
-                    CONF_REGION: self.region,
-                    CONF_HOLIDAYS: user_input[CONF_HOLIDAYS],
-                },
+                title=info["title"],
+                data=self.data
             )
-
-        holidays = get_holiday_options(self.country, self.region)
-        if not holidays:
-            return self.async_abort(reason="no_holidays_found")
+        
+        country = self.data.get("country")
+        regions = await self.hass.async_add_executor_job(
+            self.api.get_regions, country
+        )
 
         schema = vol.Schema({
-            vol.Optional(CONF_NAME, default="School Holiday"): cv.string,
-            vol.Required(CONF_HOLIDAYS): vol.All(cv.ensure_list, [vol.In(holidays)]),
+            vol.Required("region"): vol.In(sorted(list(regions.keys()))),
         })
-        return self.async_show_form(step_id="holidays", data_schema=schema)
+
+        return self.async_show_form(
+            step_id="region",
+            data_schema=schema,
+            errors=errors
+        )
