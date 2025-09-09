@@ -10,6 +10,7 @@
     },
     "abort": {
       "no_countries_found": "No countries found.",
+      "already_configured": "This integration is already configured.",
       "no_regions_found": "No regions found for selected country."
     }
   }

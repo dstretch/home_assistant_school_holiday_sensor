@@ -10,6 +10,7 @@
     },
     "abort": {
       "no_countries_found": "Aucun pays trouvé.",
+      "already_configured": "Cette intégration est déjà configurée.",
       "no_regions_found": "Aucune région trouvée pour le pays sélectionné."
     }
   }

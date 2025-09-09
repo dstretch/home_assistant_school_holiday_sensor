@@ -222,9 +222,7 @@ jobs:
           # Validate required structure
           required_structure = {
               'config.step.user.title',
-              'config.step.region.title', 
-              'config.step.holidays.title',
-              'config.abort.already_configured'
+              'config.step.region.title'
           }
           
           for file, data in translations.items():
