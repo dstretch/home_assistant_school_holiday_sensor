@@ -6,7 +6,7 @@ on:
       - 'custom_components/school_holiday_sensor/holidays/**'
       - 'custom_components/school_holiday_sensor/translations/**'
       - '.github/workflows/validate-files.yml'
-
+  workflow_dispatch:
 jobs:
   validate-holidays:
     name: Validate Holiday Files
