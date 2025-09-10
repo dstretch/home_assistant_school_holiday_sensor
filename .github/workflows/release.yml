@@ -1,0 +1,23 @@
+name: Release on Tag
+
+on:
+  push:
+    tags:
+      - 'v*'       # Matches tags like v0.2.0
+
+permissions:
+  contents: write
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF#refs/tags/}" \
+            --title "${GITHUB_REF#refs/tags/}" \
+            --notes "Release ${GITHUB_REF#refs/tags/}" --generate-notes
