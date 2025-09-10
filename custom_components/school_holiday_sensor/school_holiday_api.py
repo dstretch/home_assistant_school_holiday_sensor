@@ -28,6 +28,15 @@ class SchoolHolidayAPI:
                 regions[region["name"]] = region["name"]
         return regions
 
+    def parse_date(value):
+        for fmt in ("%Y-%m-%d", "%d-%m-%Y"):
+            try:
+                return datetime.strptime(value, fmt).date()
+            except ValueError:
+                continue
+        raise ValueError(f"Invalid date format: {value}")
+
+
     def get_holidays(self, country, region):
         """Return holiday info for today and upcoming dates."""
         today = datetime.now().date()
@@ -46,8 +55,8 @@ class SchoolHolidayAPI:
 
                 for holiday in reg.get("holidays", []):
                     try:
-                        start = datetime.strptime(holiday["date_from"], "%Y-%m-%d").date()
-                        end = datetime.strptime(holiday["date_till"], "%Y-%m-%d").date()
+                        start = self.parse_date(holiday["date_from"])
+                        end = self.parse_date(holiday["date_till"])
 
                         if start <= today <= end:
                             current = holiday["name"]
