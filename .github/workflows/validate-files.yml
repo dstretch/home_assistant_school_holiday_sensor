@@ -132,9 +132,9 @@ jobs:
                             if name_year != from_year and name_year != till_year:
                                 raise ValueError(f'Holiday name year ({name_year}) does not match date years ({from_year}-{till_year})')
                 
-                      # Validate all holiday files
-                      import glob
-                      holiday_files = glob.glob('custom_components/school_holiday_sensor/holidays/*.yaml')
+          # Validate all holiday files
+          import glob
+          holiday_files = glob.glob('custom_components/school_holiday_sensor/holidays/*.yaml')
           
           for file in holiday_files:
               try:
