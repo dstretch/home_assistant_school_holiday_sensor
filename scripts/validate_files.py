@@ -13,11 +13,22 @@ from datetime import datetime
 from collections import defaultdict
 from pathlib import Path
 
+def parse_date(value):
+    """Tries to extract a date from a value"""
+    datestring = str(value)
+
+    for fmt in ("%Y-%m-%d", "%d-%m-%Y"):
+        try:
+            return datetime.strptime(datestring, fmt).date()
+        except ValueError:
+            continue
+    raise ValueError(f"Invalid date format: {datestring}")
+
 
 def validate_date_format(date_str):
-    """Validate DD-MM-YYYY format"""
+    """Validate provided date format"""
     try:
-        datetime.strptime(date_str, '%d-%m-%Y')
+        parse_date(date_str)
         return True
     except ValueError:
         return False
@@ -56,14 +67,14 @@ def validate_holiday_file(filepath):
                     raise ValueError(f'Holiday missing required field: {field}')
             
             if not validate_date_format(holiday['date_from']):
-                raise ValueError(f'Invalid date_from format: {holiday["date_from"]} (expected DD-MM-YYYY)')
+                raise ValueError(f'Invalid date_from format: {holiday["date_from"]} (expected YYYY-MM-DD or DD-MM-YYYY)')
             
             if not validate_date_format(holiday['date_till']):
-                raise ValueError(f'Invalid date_till format: {holiday["date_till"]} (expected DD-MM-YYYY)')
+                raise ValueError(f'Invalid date_till format: {holiday["date_till"]} (expected YYYY-MM-DD or DD-MM-YYYY)')
             
             # Validate date logic
-            from_date = datetime.strptime(holiday['date_from'], '%d-%m-%Y')
-            till_date = datetime.strptime(holiday['date_till'], '%d-%m-%Y')
+            from_date = parse_date(holiday['date_from'])
+            till_date = parse_date(holiday['date_till'])
             
             if from_date > till_date:
                 raise ValueError(f'date_from ({holiday["date_from"]}) cannot be after date_till ({holiday["date_till"]})')

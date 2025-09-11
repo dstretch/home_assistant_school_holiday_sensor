@@ -29,12 +29,15 @@ class SchoolHolidayAPI:
         return regions
 
     def parse_date(value):
+        """Tries to extract a date from a value"""
+        datestring = str(value)
+
         for fmt in ("%Y-%m-%d", "%d-%m-%Y"):
             try:
-                return datetime.strptime(value, fmt).date()
+                return datetime.strptime(datestring, fmt).date()
             except ValueError:
                 continue
-        raise ValueError(f"Invalid date format: {value}")
+        raise ValueError(f"Invalid date format: {datestring}")
 
 
     def get_holidays(self, country, region):
